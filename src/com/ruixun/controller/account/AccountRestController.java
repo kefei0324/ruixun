@@ -94,6 +94,82 @@ public class AccountRestController {
 			return buildVo(null, null);
 		}
 	}
+	/**
+	 * 用户注册接口
+	 * 
+	 * @param name
+	 * @param pwd
+	 */
+	@RequestMapping(value = "/register2", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultVo<AccountVo> register2(@RequestParam("name") String name, @RequestParam("pwd") String pwd,
+			@RequestParam("device") String device) {
+		try {
+			Device _device = null;
+			name = new String(name.getBytes("iso-8859-1"), "utf-8");
+			try {
+				_device = deviceService.findByName(device);
+			} catch (Exception e) {
+				return buildVo(null, "登陆失败,请检查设备名!");
+			}
+			if (null == _device) {
+				return buildVo(null, "登陆失败,请检查设备名!");
+			}
+			// 验证用户名密码的合法性
+			List<Account> accouts = accountService.getByDeviceId(_device.getId());
+			boolean has = false;// 是否已注册
+			if (null != accouts) {
+				if (accouts.size() >= 10) {
+					return buildVo(null, "该设备已注册10人");
+				}
+				for (Account account : accouts) {
+					if (!name.equals(account.getName())) {
+						
+					} else {
+						// 有人注册过该用户名
+						has = true;
+						break;
+					}
+				}
+				if (!has) {
+					// 无人注册则保存用户到数据库
+					Account account = new Account();
+					account.setName(name);
+					account.setPwd(pwd);
+					account.setDeviceid(_device.getId());
+					String d = DateTimeUtil.getCurDateTime();
+					account.setCreatetime(d);
+					account = accountService.saveAccountInfo(account);
+					// 返回用户信息
+					// account =
+					// accountService.findByNameAndPwdAndDeviceid(name, pwd,
+					// deviceId);
+					logger.info("new account build:" + account.getId());
+					return buildVo(account, null);
+				} else {
+					// 已经有人注册
+					return buildVo(null, "该用户名已经注册!");
+				}
+			} else {
+				// 无人注册则保存用户到数据库
+				Account account = new Account();
+				account.setName(name);
+				account.setPwd(pwd);
+				account.setDeviceid(_device.getId());
+				String d = DateTimeUtil.getCurDateTime();
+				account.setCreatetime(d);
+				account = accountService.saveAccountInfo(account);
+				// 返回用户信息
+				// account =
+				// accountService.findByNameAndPwdAndDeviceid(name, pwd,
+				// deviceId);
+				logger.info("new account build:" + account.getId());
+				return buildVo(account, null);
+			}
+		} catch (Exception e) {
+			return buildVo(null, null);
+		}
+	}
 
 	/**
 	 * 创建account相关返回数据
@@ -132,6 +208,39 @@ public class AccountRestController {
 			name = new String(name.getBytes("iso-8859-1"), "utf-8");
 			// 返回用户信息
 			Account account = accountService.findByNameAndPwdAndDeviceid(name, pwd, deviceId);
+			if (null != account) {
+				return buildVo(account, null);
+			}
+		} catch (Exception e) {
+			// 已经有人注册
+			return buildVo(null, "登陆失败,请检查用户名和密码!");
+		}
+		return buildVo(null, "登陆失败,请检查用户名和密码!");
+	}
+
+	/**
+	 * 用户登录接口
+	 * 
+	 * @param name
+	 * @param pwd
+	 */
+	@RequestMapping(value = "/login2", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultVo<AccountVo> login2(@RequestParam("name") String name, @RequestParam("pwd") String pwd,
+			@RequestParam("device") String device) {
+		try {
+			Device _device = null;
+			name = new String(name.getBytes("iso-8859-1"), "utf-8");
+			try {
+				_device = deviceService.findByName(device);
+			} catch (Exception e) {
+				return buildVo(null, "登陆失败,请检查设备名!");
+			}
+			if (null == _device) {
+				return buildVo(null, "登陆失败,请检查设备名!");
+			}
+			// 返回用户信息
+			Account account = accountService.findByNameAndPwdAndDeviceid(name, pwd, _device.getId());
 			if (null != account) {
 				return buildVo(account, null);
 			}
@@ -235,7 +344,7 @@ public class AccountRestController {
 			Account account = accountService.findById(userid);
 			if (null != account) {
 				account.setPwd(USER_RESET_PWD);
-				account=accountService.saveAccountInfo(account);
+				account = accountService.saveAccountInfo(account);
 				return buildVo(account, null);
 			}
 		} catch (Exception e) {
@@ -296,7 +405,7 @@ public class AccountRestController {
 						// 设备处于无操作状态
 						account.setStatus(USER_UNDER_OPERATION);// 用户设为操作状态
 						device.setStatus(DEVICE_UNDER_OPERATION);
-						device=deviceService.saveDeviceInfo(device);
+						device = deviceService.saveDeviceInfo(device);
 						account = accountService.saveAccountInfo(account);
 						return buildVo(account, null);
 					} else {
@@ -305,7 +414,7 @@ public class AccountRestController {
 							// 用户处于操作状态
 							account.setStatus(USER_NONE_OPERATION);// 取消操作状态
 							device.setStatus(DEVICE_NONE_OPERATION);
-							device=deviceService.saveDeviceInfo(device);
+							device = deviceService.saveDeviceInfo(device);
 							account = accountService.saveAccountInfo(account);// 保存
 							return buildVo(account, null);// 返回用户信息
 						} else {
