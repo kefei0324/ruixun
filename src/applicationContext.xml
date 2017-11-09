@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd"
+	default-lazy-init="true">
+	<description>Spring公共配置</description>
+	<context:component-scan base-package="com.ruixun">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
+
+	<!-- Jpa Entity Manager 配置 -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter" />
+		<property name="packagesToScan" value="com.ruixun" />
+		<property name="jpaProperties">
+			<props>
+				<!-- 命名规则 My_NAME->MyName -->
+				<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="hibernateJpaVendorAdapter"
+		class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="databasePlatform">
+			<bean factory-method="getDialect"
+				class="org.springside.modules.persistence.Hibernates">
+				<constructor-arg ref="dataSource" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="jacksonObjectMapper" class="com.ruixun.utils.ObjectMappingCustomer" />
+	<!-- Spring Data Jpa配置 -->
+	<jpa:repositories base-package="com.ruixun"
+		transaction-manager-ref="transactionManager"
+		entity-manager-factory-ref="entityManagerFactory"
+		factory-class="org.springside.modules.persistence.MyJpaRepositoryFactoryBean" />
+	<!-- Jpa 事务配置 -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	<!-- 使用annotation定义事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager"
+		proxy-target-class="true" />
+
+	<!-- 上传文件 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8"></property>
+		<property name="maxUploadSize" value="52428800"></property>
+		<property name="maxInMemorySize" value="4096" />
+		<property name="uploadTempDir" value="temp"></property>
+	</bean>
+
+	<!-- 数据源配置, 使用Tomcat JDBC连接池 -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath*:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
+		destroy-method="close">
+		<!-- Connection Info -->
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<!-- <property name="driverClassName" value="com.mysql.jdbc.Driver" /> -->
+		<property name="url" value="${jdbc.url}" />
+		<!-- <property name="url" value="jdbc:mysql://localhost:3306/ruixun" /> -->
+		<property name="username" value="${jdbc.username}" />
+		<!-- <property name="username" value="root" /> -->
+		<property name="password" value="${jdbc.password}" />
+		<!-- <property name="password" value="123456" /> -->
+
+		<!-- Connection Pooling Info -->
+		<property name="maxActive" value="${jdbc.pool.maxActive}" />
+		<!-- <property name="maxActive" value="50" /> -->
+		<!-- <property name="maxIdle" value="10" /> -->
+		<property name="maxIdle" value="${jdbc.pool.maxIdle}" />
+		<!-- <property name="maxIdle" value="${jdbc.pool.maxIdle}" /> -->
+		<property name="defaultAutoCommit" value="false" />
+		<!-- 连接Idle一个小时后超时 -->
+		<property name="timeBetweenEvictionRunsMillis" value="3600000" />
+		<property name="minEvictableIdleTimeMillis" value="3600000" />
+
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="${jdbc.testOnBorrow}" />
+		<!-- <property name="testOnBorrow" value="true" /> -->
+		<property name="testOnReturn" value="${jdbc.testOnReturn}" />
+		<!-- <property name="testOnReturn" value="false" /> -->
+		<property name="validationInterval" value="30000" />
+		<property name="validationQuery" value="${jdbc.validationQuery}" />
+		<!-- <property name="validationQuery" value="select 1" /> -->
+		<property name="initialSize" value="1" />
+		<property name="maxWait" value="10000" />
+		<property name="minIdle" value="${jdbc.pool.minIdle}" />
+		<!-- <property name="minIdle" value="2" /> -->
+		<property name="logAbandoned" value="false" />
+		<property name="removeAbandoned" value="true" />
+		<property name="removeAbandonedTimeout" value="60" />
+		<property name="jdbcInterceptors"
+			value="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer" />
+	</bean>
+	<bean class="com.ruixun.udp.manager.UDP"></bean>
+</beans>
