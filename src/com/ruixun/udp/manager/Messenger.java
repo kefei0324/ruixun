@@ -103,7 +103,8 @@ public class Messenger implements Runnable {
 			int deviceid = device.getId();// 设备id
 			if (status == 1) {
 				// 查用户权限
-				Account account = accountService.findByStatus(1);// 设备当前用户
+//				Account account = accountService.findByStatus(1);// 设备当前用户
+				Account account = accountService.findByStatusAndDeviceid(status, deviceid);
 				if (null != account) {
 					msg = m.createMsg(account.getId(), deviceid, devicename);
 				} else {

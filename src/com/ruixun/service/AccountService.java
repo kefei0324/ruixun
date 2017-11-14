@@ -23,6 +23,9 @@ public class AccountService {
 	public Account findByStatus(int status){
 		return accountDao.findByStatus(status);
 	}
+	public Account findByStatusAndDeviceid(int status,int deviceid){
+		return accountDao.findByStatusAndDeviceid(status,deviceid);
+	}
 	
 	public Account findByNameAndPwdAndDeviceid(String name, String pwd, int deviceId) {
 		return accountDao.findByNameAndPwdAndDeviceid(name, pwd, deviceId);

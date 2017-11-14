@@ -217,17 +217,17 @@ public final class ClientMessage {
 		String data11 = msg.getData11();
 		vo.setData11(data11);
 		float data_1 = Float.parseFloat(data1);
-		if (data_1 >= 5.0 && data_1 < 7.5) {
+		if (data_1 >= 4.5 && data_1 < 8) {
 			vo.setData1f(true);
 			vo.setData1s("中性体质");
 			vo.setData1sc(NORMAL_SC);
 		} else {
 			vo.setData1f(false);
-			vo.setData1s(data_1 < 5.0 ? "酸性体质" : "碱性体质");
+			vo.setData1s(data_1 < 4.5 ? "酸性体质" : "碱性体质");
 			vo.setData1sc(6.36f);
 		}
 
-		if ("- ".equals(data2)) {
+		if ("-".equals(data2.trim())) {
 			vo.setData2f(true);
 			vo.setData2s("正常");
 			vo.setData2sc(NORMAL_SC);
@@ -237,7 +237,7 @@ public final class ClientMessage {
 			vo.setData2sc(0f);
 		}
 
-		if ("-".equals(data3) || "±".equals(data3)) {
+		if ("-".equals(data3.trim()) /*|| "±".equals(data3)*/) {
 			vo.setData3f(true);
 			vo.setData3s("正常");
 			vo.setData3sc(NORMAL_SC);
@@ -257,7 +257,7 @@ public final class ClientMessage {
 				vo.setData3sc(0f);
 			}
 		}
-		if ("- ".equals(data4) || "±".equals(data4)) {
+		if ("-".equals(data4.trim()) || "±".equals(data4.trim())) {
 			vo.setData4f(true);
 			vo.setData4s("正常");
 			vo.setData4sc(NORMAL_SC);
@@ -278,23 +278,23 @@ public final class ClientMessage {
 			}
 		}
 		float data_5 = Float.parseFloat(data5);
-		if (data_5 <= 1.015) {
+		if (data_5 <= 1.035&&data_5>=1.005) {
 			vo.setData5f(true);
 			vo.setData5s("正常");
 			vo.setData5sc(NORMAL_SC);
 		} else {
 			vo.setData5f(false);
-			vo.setData5s("尿比重偏高");
+			vo.setData5s("尿比重异常");
 			vo.setData5sc(data_5 > 1.025 ? 0f : 6.36f);
 		}
 
-		if ("- ".equals(data6)) {
+		if ("-".equals(data6.trim())) {
 			vo.setData6f(true);
 			vo.setData6s("正常");
 			vo.setData6sc(NORMAL_SC);
 		} else {
 			vo.setData6f(false);
-			vo.setData6s("尿中有隐血");
+			vo.setData6s("隐血异常");
 			if ("±".equals(data6)) {
 				vo.setData6sc(6.82f);
 			}
@@ -308,13 +308,13 @@ public final class ClientMessage {
 				vo.setData6sc(0f);
 			}
 		}
-		if ("- ".equals(data7) || "±".equals(data7)) {
+		if ("-".equals(data7.trim())/* || "±".equals(data7)*/) {
 			vo.setData7f(true);
 			vo.setData7s("正常");
 			vo.setData7sc(NORMAL_SC);
 		} else {
 			vo.setData7f(false);
-			vo.setData7s("尿中蛋白质偏高");
+			vo.setData7s("尿中蛋白质异常");
 			if ("+1".equals(data7)) {
 				vo.setData7sc(6.82f);
 			}
@@ -328,13 +328,13 @@ public final class ClientMessage {
 				vo.setData7sc(0f);
 			}
 		}
-		if ("- ".equals(data8)) {
+		if ("-".equals(data8.trim())) {
 			vo.setData8f(true);
 			vo.setData8s("正常");
 			vo.setData8sc(NORMAL_SC);
 		} else {
 			vo.setData8f(false);
-			vo.setData8s("尿中胆红素偏高");
+			vo.setData8s("尿中胆红素异常");
 			if ("+1".equals(data8)) {
 				vo.setData8sc(6.82f);
 			}
@@ -348,13 +348,13 @@ public final class ClientMessage {
 				vo.setData8sc(0f);
 			}
 		}
-		if (com.mysql.jdbc.StringUtils.isEmptyOrWhitespaceOnly(data9)) {
+		if ("NO".equals(data9.trim())) {
 			vo.setData9f(true);
 			vo.setData9s("正常");
 			vo.setData9sc(NORMAL_SC);
 		} else {
 			vo.setData9f(false);
-			vo.setData9s("尿胆原偏高");
+			vo.setData9s("尿胆原异常");
 			if ("+1".equals(data9)) {
 				vo.setData9sc(6.82f);
 			}
@@ -368,13 +368,13 @@ public final class ClientMessage {
 				vo.setData9sc(0f);
 			}
 		}
-		if ("- ".equals(data10)) {
+		if ("-".equals(data10.trim())) {
 			vo.setData10f(true);
 			vo.setData10s("正常");
 			vo.setData10sc(NORMAL_SC);
 		} else {
 			vo.setData10f(false);
-			vo.setData10s("尿中酮体偏高");
+			vo.setData10s("尿中酮体异常");
 			if ("±".equals(data10)) {
 				vo.setData10sc(6.82f);
 			}
@@ -388,13 +388,13 @@ public final class ClientMessage {
 				vo.setData10sc(0f);
 			}
 		}
-		if ("- ".equals(data11)) {
+		if ("-".equals(data11.trim())) {
 			vo.setData11f(true);
 			vo.setData11s("正常");
 			vo.setData11sc(NORMAL_SC);
 		} else {
 			vo.setData11f(false);
-			vo.setData11s("尿中白细胞值偏高");
+			vo.setData11s("尿中白细胞值异常");
 			if ("±".equals(data11)) {
 				vo.setData11sc(6.82f);
 			}

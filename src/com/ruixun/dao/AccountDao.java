@@ -17,4 +17,6 @@ public interface AccountDao extends MyJpaRepository<Account, Serializable>{
 	Account findByIdAndDeviceid(int accountid, int deviceid);
 
 	Account findByStatus(int status);
+	
+	Account findByStatusAndDeviceid(int status,int deviceid);
 }
